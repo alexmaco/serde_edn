@@ -7,5 +7,6 @@ edition = "2018"
 keywords = ["edn", "serde", "clojure"]
 repository = "https://github.com/alexmaco/serde_edn.git"
 description = "edn support for serde"
+readme = "README.md"
 
 [dependencies]
