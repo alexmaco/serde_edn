@@ -1,0 +1,9 @@
+[package]
+name = "serde_edn"
+version = "0.1.0"
+authors = ["Alexandru Macovei <alexnmaco@gmail.com>"]
+license = "MIT/Apache-2.0/GPLv3"
+edition = "2018"
+keywords = ["edn", "serde", "clojure"]
+
+[dependencies]
