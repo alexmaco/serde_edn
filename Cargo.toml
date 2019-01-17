@@ -10,3 +10,4 @@ description = "edn support for serde"
 readme = "README.md"
 
 [dependencies]
+serde = "1.0"

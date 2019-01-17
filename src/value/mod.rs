@@ -1,6 +1,8 @@
+mod de;
+
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Value {
     Nil,
     Bool(bool),
@@ -17,15 +19,19 @@ pub enum Value {
     Tagged(Tagged),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Symbol {
     Simple(String),
     Namespaced { prefix: String, name: String },
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Tagged {
     Inst(std::time::Instant),
     UUID(u128),
-    User { prefix: String, name: String, value: Box<Value> },
+    User {
+        prefix: String,
+        name: String,
+        value: Box<Value>,
+    },
 }
