@@ -39,3 +39,62 @@ fn string_escapes() {
         from_str::<Value>(edn)
     );
 }
+
+#[test]
+fn char() {
+    let edn = r#"\Z"#;
+    assert_eq!(Ok(Value::Char('Z')), from_str::<Value>(edn));
+}
+
+#[test]
+fn char_sequences() {
+    let edn = r#"\newline"#;
+    assert_eq!(Ok(Value::Char('\n')), from_str::<Value>(edn));
+
+    let edn = r#"\return"#;
+    assert_eq!(Ok(Value::Char('\r')), from_str::<Value>(edn));
+
+    let edn = r#"\space"#;
+    assert_eq!(Ok(Value::Char(' ')), from_str::<Value>(edn));
+
+    let edn = r#"\tab"#;
+    assert_eq!(Ok(Value::Char('\t')), from_str::<Value>(edn));
+
+    // FIXME: part of edn but not implemented by the parser we use
+    //let edn = r#"\u1234"#;
+    //assert_eq!(Ok(Value::Char('\u{1234}')), from_str::<Value>(edn));
+}
+
+#[test]
+fn integer_fixed() {
+    let expected = Ok(Value::Integer(13));
+    assert_eq!(from_str("13"), expected);
+    assert_eq!(from_str("+13"), expected);
+
+    let expected = Ok(Value::Integer(-53));
+    assert_eq!(from_str("-53"), expected);
+
+    let expected = Ok(Value::Integer(0));
+    assert_eq!(from_str("0"), expected);
+    assert_eq!(from_str("-0"), expected);
+    assert_eq!(from_str("+0"), expected);
+
+    // FIXME: edn specifies integers may not start with 0, but the parser accepts them
+    //let expected = Err(Error::Bad);
+    //assert_eq!(from_str::<Value>("04"), expected);
+}
+
+#[test]
+fn float_fixed() {
+    let expected = Ok(Value::Float(13.0));
+    assert_eq!(from_str("13.0"), expected);
+    assert_eq!(from_str("+13.0"), expected);
+
+    let expected = Ok(Value::Float(-53.0));
+    assert_eq!(from_str("-53.0"), expected);
+
+    let expected = Ok(Value::Float(0.0));
+    assert_eq!(from_str("0.0"), expected);
+    assert_eq!(from_str("-0.0"), expected);
+    assert_eq!(from_str("+0.0"), expected);
+}

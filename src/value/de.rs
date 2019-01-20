@@ -42,4 +42,32 @@ impl<'de> Visitor<'de> for ValueVisitor {
     {
         Ok(Value::String(v.to_owned()))
     }
+
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        Ok(Value::String(v))
+    }
+
+    fn visit_char<E>(self, v: char) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        Ok(Value::Char(v))
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        Ok(Value::Integer(v))
+    }
+
+    fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        Ok(Value::Float(v))
+    }
 }

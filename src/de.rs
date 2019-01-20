@@ -75,6 +75,9 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
             EValue::Nil => visitor.visit_unit(),
             EValue::Boolean(b) => visitor.visit_bool(b),
             EValue::String(s) => visitor.visit_str(&s),
+            EValue::Char(c) => visitor.visit_char(c),
+            EValue::Integer(i) => visitor.visit_i64(i),
+            EValue::Float(f) => visitor.visit_f64(f.into_inner()),
             _ => visitor.visit_unit(),
         }
     }
