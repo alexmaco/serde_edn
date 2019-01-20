@@ -36,7 +36,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
         Ok(Value::Bool(v))
     }
 
-    fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
         E: Error,
     {
