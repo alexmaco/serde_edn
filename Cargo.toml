@@ -12,3 +12,5 @@ readme = "README.md"
 [dependencies]
 serde = "1.0"
 edn = "0.3"
+maplit = "1"
+ordered-float = "1.0.1"

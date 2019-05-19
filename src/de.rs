@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 use serde::de::DeserializeOwned;
 use serde::de::{
     self, Deserialize, DeserializeSeed, EnumAccess, IntoDeserializer, MapAccess, SeqAccess,

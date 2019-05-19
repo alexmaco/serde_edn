@@ -86,14 +86,16 @@ fn integer_fixed() {
 
 #[test]
 fn float_fixed() {
-    let expected = Ok(Value::Float(13.0));
+    use ordered_float::OrderedFloat as OF;
+
+    let expected = Ok(Value::Float(OF(13.0)));
     assert_eq!(from_str("13.0"), expected);
     assert_eq!(from_str("+13.0"), expected);
 
-    let expected = Ok(Value::Float(-53.0));
+    let expected = Ok(Value::Float(OF(-53.0)));
     assert_eq!(from_str("-53.0"), expected);
 
-    let expected = Ok(Value::Float(0.0));
+    let expected = Ok(Value::Float(OF(0.0)));
     assert_eq!(from_str("0.0"), expected);
     assert_eq!(from_str("-0.0"), expected);
     assert_eq!(from_str("+0.0"), expected);

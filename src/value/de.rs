@@ -68,6 +68,6 @@ impl<'de> Visitor<'de> for ValueVisitor {
     where
         E: Error,
     {
-        Ok(Value::Float(v))
+        Ok(Value::Float(v.into()))
     }
 }

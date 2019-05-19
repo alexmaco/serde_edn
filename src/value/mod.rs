@@ -1,8 +1,8 @@
 mod de;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Value {
     Nil,
     Bool(bool),
@@ -11,20 +11,28 @@ pub enum Value {
     Symbol(Symbol),
     Keyword(String),
     Integer(i64),
-    Float(f64),
+    Float(ordered_float::OrderedFloat<f64>),
     List(Vec<Value>),
     Vector(Vec<Value>),
-    //Map(HashMap<Value, Value>),
-    //Set(HashSet<Value>),
+    Map(BTreeMap<Value, Value>),
+    Set(BTreeSet<Value>),
     Tagged(Tagged),
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Symbol {
-    inner: String,
+impl Value {
+    pub fn symbol<S: ToString>(s: S) -> Value {
+        Value::Symbol(Symbol {
+            inner: s.to_string(),
+        })
+    }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Symbol {
+    pub(crate) inner: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Tagged {
     Inst(std::time::Instant),
     UUID(u128),

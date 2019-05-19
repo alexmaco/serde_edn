@@ -1,3 +1,4 @@
+#![allow(warnings)]
 /// An error that can occur during `edn` deserialization
 #[derive(Debug, PartialEq, Clone)]
 pub enum Error {
