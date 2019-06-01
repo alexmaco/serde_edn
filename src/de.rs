@@ -10,6 +10,7 @@ use edn::parser::Parser;
 use edn::Value as EValue;
 
 use crate::error::Error;
+use crate::Value;
 
 use std::ops::{AddAssign, MulAssign, Neg};
 
@@ -56,6 +57,24 @@ impl<'de> Deserializer<'de> {
     }
 }
 
+struct ListAccess(Vec<Value>);
+
+use std::result;
+impl<'de> SeqAccess<'de> for ListAccess {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> result::Result<Option<T::Value>, Self::Error>
+    where
+        T: DeserializeSeed<'de>,
+    {
+        if self.0.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(seed.deserialize(self.0.remove(0))?))
+        }
+    }
+}
+
 impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     type Error = Error;
 
@@ -80,7 +99,10 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
             EValue::Char(c) => visitor.visit_char(c),
             EValue::Integer(i) => visitor.visit_i64(i),
             EValue::Float(f) => visitor.visit_f64(f.into_inner()),
-            _ => visitor.visit_unit(),
+            EValue::List(l) => {
+                visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
+            }
+            other => panic!("unhandled case {:?}", other),
         }
     }
 

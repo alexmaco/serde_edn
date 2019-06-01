@@ -100,3 +100,13 @@ fn float_fixed() {
     assert_eq!(from_str("-0.0"), expected);
     assert_eq!(from_str("+0.0"), expected);
 }
+
+#[test]
+fn list() {
+    let expected = Ok(Value::List(vec![
+        Value::integer(1),
+        Value::float(0.3),
+        Value::string("defxy"),
+    ]));
+    assert_eq!(expected, from_str(r#"(1 .3 "defxy")"#));
+}
