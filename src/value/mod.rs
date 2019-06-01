@@ -48,12 +48,19 @@ macro_rules! is_as_accessor {
 }
 
 macro_rules! is_as_accessor_val {
-    ($is_method:ident, $as_method:ident, $variant:ident, $return:ty) => {
+    ($is_method:ident, $as_method:ident, $as_mut:ident, $variant:ident, $return:ty) => {
         is_accessor!($is_method, $as_method);
 
         pub fn $as_method(&self) -> Option<$return> {
             match self {
                 Value::$variant(v) => Some(v.clone().into()),
+                _ => None,
+            }
+        }
+
+        pub fn $as_mut(&mut self) -> Option<&mut $return> {
+            match self {
+                Value::$variant(v) => Some(v),
                 _ => None,
             }
         }
@@ -100,10 +107,10 @@ impl Value {
     is_as_accessor!(is_set, as_set, as_set_mut, Set, BTreeSet<Value>);
     is_as_accessor!(is_tagged, as_tagged, as_tagged_mut, Tagged, Tagged);
 
-    is_as_accessor_val!(is_integer, as_integer, Integer, i64);
-    is_as_accessor_val!(is_float, as_float, Float, f64);
-    is_as_accessor_val!(is_char, as_char, Char, char);
-    is_as_accessor_val!(is_bool, as_bool, Bool, bool);
+    is_as_accessor_val!(is_integer, as_integer, as_integer_mut, Integer, i64);
+    is_as_accessor_val!(is_float, as_float, as_float_mut, Float, f64);
+    is_as_accessor_val!(is_char, as_char, as_char_mut, Char, char);
+    is_as_accessor_val!(is_bool, as_bool, as_bool_mut, Bool, bool);
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
