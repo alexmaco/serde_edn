@@ -173,7 +173,7 @@ impl From<EValue> for Value {
             EValue::Symbol(s) => Value::symbol(s),
             EValue::Keyword(s) => Value::Keyword(s),
             EValue::Integer(i) => Value::Integer(i),
-            EValue::Float(f) => Value::Float(f),
+            EValue::Float(f) => Value::Float(f.into_inner().into()),
             EValue::List(v) => Value::List(v.into_iter().map(|e| Value::from(e)).collect()),
             EValue::Vector(v) => Value::Vector(v.into_iter().map(|e| Value::from(e)).collect()),
             EValue::Map(m) => Value::Map(
