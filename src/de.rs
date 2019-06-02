@@ -173,11 +173,16 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     deserialize_float!(deserialize_f32, f32, visit_f32);
     deserialize_float!(deserialize_f64, f64, visit_f64);
 
-    fn deserialize_char<V>(self, _visitor: V) -> Result<V::Value>
+    fn deserialize_char<V>(self, visitor: V) -> Result<V::Value>
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        let parsed = self.read_parsed()?;
+
+        match parsed {
+            EValue::Char(c) => visitor.visit_char(c),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_str<V>(self, visitor: V) -> Result<V::Value>

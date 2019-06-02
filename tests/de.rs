@@ -43,3 +43,9 @@ fn float() {
     assert_eq!(from_str::<f32>("0.3"), Ok(0.3_f32));
     assert_eq!(from_str::<f64>("0.5"), Ok(0.5_f64));
 }
+
+#[test]
+fn char() {
+    assert_eq!(from_str::<char>(r#"\c"#), Ok('c'));
+    assert_eq!(from_str::<char>(r#"\tababab"#), Err(Error::Bad));
+}
