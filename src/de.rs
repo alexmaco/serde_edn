@@ -189,14 +189,20 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::String(s) => visitor.visit_string(s),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_string<V>(self, visitor: V) -> Result<V::Value>
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::String(s) => visitor.visit_string(s),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_bytes<V>(self, _visitor: V) -> Result<V::Value>

@@ -49,3 +49,20 @@ fn char() {
     assert_eq!(from_str::<char>(r#"\c"#), Ok('c'));
     assert_eq!(from_str::<char>(r#"\tababab"#), Err(Error::Bad));
 }
+
+#[test]
+fn strings() {
+    let data = String::from(r#""astring""#);
+    let parsed = from_str::<String>(data.as_str());
+
+    assert_eq!(parsed, Ok("astring".into()));
+
+    // str disabled due to parser limitations
+    /*
+    let data = String::from(r#""astring""#);
+    let middle: &str = data.as_str().trim_matches('"');
+    let parsed = from_str::<&str>(data.as_str());
+
+    assert_eq!(parsed, Ok(middle));
+    */
+}
