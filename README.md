@@ -1,9 +1,9 @@
 ## Work in progress
 
 Serde support for [edn](https://github.com/edn-format/edn).
-At the moment it uses [edn.rs](https://docs.rs/edn/)
+At the moment it uses [edn.rs](https://docs.rs/edn/) to bootstrap development. The parser will be replaced in the future.
 
-`serde_edn` also provides its own `Value` type and `edn!` macro for constructing values, albeit with some current limitations due to the different treatment of whitespace and tokens between rust and edn syntax.
+`serde_edn` also provides its own `Value` type and `edn!` macro for constructing values
 
 `serde_edn` is heavily inspired and modeled after [serde_json](https://crates.io/crates/serde_json)
 
@@ -35,7 +35,12 @@ Serialization:
 * [ ] Serialization
 * [ ] Deserialization
 * [ ] `edn!` macro
-* [ ] utility functions for `Value`
+* [x] utility functions for `Value`
+
+
+## Limitations
+
+* the `edn!` macro has some inherent limitations, due to the different treatment of whitespace and tokens between rust and edn syntax.
 
 
 ## Future goals
