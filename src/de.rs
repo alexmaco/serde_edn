@@ -133,7 +133,12 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        let parsed = self.read_parsed()?;
+
+        match parsed {
+            EValue::Boolean(b) => visitor.visit_bool(b),
+            _ => Err(Error::Bad),
+        }
     }
 
     deserialize_integer!(deserialize_i8, i8, visit_i8);
