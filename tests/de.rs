@@ -7,7 +7,7 @@ macro_rules! integer_test {
         let over = $overflow;
         assert_eq!(
             from_str::<$int>(&over.to_string()),
-            Err(Error::IntegerOutOfBounds)
+            Err(Error::NumericOutOfBounds)
         );
 
         assert_eq!(from_str::<$int>(":kw"), Err(Error::Bad));
@@ -36,4 +36,10 @@ fn integers() {
 
     // FIXME disabled led due to parser bug
     //integer_test!(u64, 2_u64.pow(33), 2_usize.pow(63) + 1);
+}
+
+#[test]
+fn float() {
+    assert_eq!(from_str::<f32>("0.3"), Ok(0.3_f32));
+    assert_eq!(from_str::<f64>("0.5"), Ok(0.5_f64));
 }

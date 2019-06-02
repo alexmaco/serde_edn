@@ -97,7 +97,26 @@ macro_rules! deserialize_integer {
 
             match parsed {
                 EValue::Integer(i) => {
-                    let conv = <$int as num_traits::NumCast>::from(i).ok_or(Error::IntegerOutOfBounds)?;
+                    let conv = <$int as num_traits::NumCast>::from(i).ok_or(Error::NumericOutOfBounds)?;
+                    visitor.$visit_method(conv)
+                }
+                _ => Err(Error::Bad),
+            }
+        }
+    }
+}
+
+macro_rules! deserialize_float {
+    ($method:ident, $float:ty, $visit_method:ident) => {
+        fn $method<V>(self, visitor: V) -> Result<V::Value>
+        where
+            V: Visitor<'de>,
+        {
+            let parsed = self.read_parsed()?;
+
+            match parsed {
+                EValue::Float(i) => {
+                    let conv = <$float as num_traits::NumCast>::from(i.into_inner()).ok_or(Error::NumericOutOfBounds)?;
                     visitor.$visit_method(conv)
                 }
                 _ => Err(Error::Bad),
@@ -151,19 +170,8 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     deserialize_integer!(deserialize_u32, u32, visit_u32);
     deserialize_integer!(deserialize_u64, u64, visit_u64);
 
-    fn deserialize_f32<V>(self, _visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_f64<V>(self, _visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
+    deserialize_float!(deserialize_f32, f32, visit_f32);
+    deserialize_float!(deserialize_f64, f64, visit_f64);
 
     fn deserialize_char<V>(self, _visitor: V) -> Result<V::Value>
     where
