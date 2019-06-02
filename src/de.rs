@@ -55,6 +55,18 @@ impl<'de> Deserializer<'de> {
     fn parse_string(&mut self) -> Result<&'de str> {
         unimplemented!()
     }
+
+    fn read_parsed(&mut self) -> Result<EValue> {
+        match self.parser.read() {
+            Some(Ok(v)) => Ok(v),
+            None => Err(Error::Eof),
+            Some(Err(e)) => Err(if e.message.contains("EOF") {
+                Error::Eof
+            } else {
+                Error::Bad
+            }),
+        }
+    }
 }
 
 struct ListAccess(Vec<Value>);
@@ -75,6 +87,25 @@ impl<'de> SeqAccess<'de> for ListAccess {
     }
 }
 
+macro_rules! deserialize_integer {
+    ($method:ident, $int:ty, $visit_method:ident) => {
+        fn $method<V>(self, visitor: V) -> Result<V::Value>
+        where
+            V: Visitor<'de>,
+        {
+            let parsed = self.read_parsed()?;
+
+            match parsed {
+                EValue::Integer(i) => {
+                    let conv = <$int as num_traits::NumCast>::from(i).ok_or(Error::IntegerOutOfBounds)?;
+                    visitor.$visit_method(conv)
+                }
+                _ => Err(Error::Bad),
+            }
+        }
+    }
+}
+
 impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     type Error = Error;
 
@@ -82,15 +113,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        let parsed = match self.parser.read() {
-            Some(Ok(v)) => v,
-            None => return Err(Error::Eof),
-            Some(Err(e)) => Err(if e.message.contains("EOF") {
-                Error::Eof
-            } else {
-                Error::Bad
-            })?,
-        };
+        let parsed = self.read_parsed()?;
 
         match parsed {
             EValue::Nil => visitor.visit_unit(),
@@ -113,61 +136,15 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         unimplemented!()
     }
 
-    fn deserialize_i8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
+    deserialize_integer!(deserialize_i8, i8, visit_i8);
+    deserialize_integer!(deserialize_i16, i16, visit_i16);
+    deserialize_integer!(deserialize_i32, i32, visit_i32);
+    deserialize_integer!(deserialize_i64, i64, visit_i64);
 
-    fn deserialize_i16<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_i32<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_i64<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_u8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_u16<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_u32<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
-
-    fn deserialize_u64<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        unimplemented!()
-    }
+    deserialize_integer!(deserialize_u8, u8, visit_u8);
+    deserialize_integer!(deserialize_u16, u16, visit_u16);
+    deserialize_integer!(deserialize_u32, u32, visit_u32);
+    deserialize_integer!(deserialize_u64, u64, visit_u64);
 
     fn deserialize_f32<V>(self, _visitor: V) -> Result<V::Value>
     where
