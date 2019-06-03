@@ -18,12 +18,14 @@ type Result<T> = std::result::Result<T, Error>;
 
 pub struct Deserializer<'a> {
     parser: Parser<'a>,
+    hack_val: Option<EValue>,
 }
 
 impl<'de> Deserializer<'de> {
     pub fn from_str(input: &'de str) -> Self {
         Deserializer {
             parser: Parser::new(input),
+            hack_val: None,
         }
     }
 }
@@ -57,6 +59,10 @@ impl<'de> Deserializer<'de> {
     }
 
     fn read_parsed(&mut self) -> Result<EValue> {
+        if let Some(v) = self.hack_val.take() {
+            return Ok(v);
+        }
+
         match self.parser.read() {
             Some(Ok(v)) => Ok(v),
             None => Err(Error::Eof),
@@ -223,7 +229,13 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::Nil => visitor.visit_none(),
+            other => {
+                self.hack_val = Some(other);
+                visitor.visit_some(self)
+            }
+        }
     }
 
     fn deserialize_unit<V>(self, visitor: V) -> Result<V::Value>

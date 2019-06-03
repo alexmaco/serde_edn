@@ -66,3 +66,9 @@ fn strings() {
     assert_eq!(parsed, Ok(middle));
     */
 }
+
+#[test]
+fn option() {
+    assert_eq!(from_str::<Option<u32>>("nil"), Ok(None));
+    assert_eq!(from_str::<Option<u32>>("3"), Ok(Some(3)));
+}
