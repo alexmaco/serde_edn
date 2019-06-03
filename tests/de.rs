@@ -72,3 +72,9 @@ fn option() {
     assert_eq!(from_str::<Option<u32>>("nil"), Ok(None));
     assert_eq!(from_str::<Option<u32>>("3"), Ok(Some(3)));
 }
+
+#[test]
+fn unit() {
+    assert_eq!(from_str::<()>("nil"), Ok(()));
+    assert_eq!(from_str::<()>("3"), Err(Error::Bad));
+}

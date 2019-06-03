@@ -242,7 +242,10 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::Nil => visitor.visit_unit(),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_unit_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value>
