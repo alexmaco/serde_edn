@@ -15,3 +15,6 @@ edn = "0.3"
 maplit = "1"
 ordered-float = "1"
 num-traits = "0.2"
+
+[dev-dependencies]
+serde_derive = "1.0.92"

@@ -1,4 +1,5 @@
 use serde_edn::{edn, from_str, Error, Value};
+use serde_derive::Deserialize;
 
 macro_rules! integer_test {
     ($int:ty, $normal:expr, $overflow:expr) => {
@@ -83,6 +84,19 @@ fn unit() {
 fn tuple_from_list_or_vec() {
     type Tup = (i32, String);
     let expected = Ok((10, String::from("abcd")));
+    assert_eq!(from_str::<Tup>(r#"(10 "abcd")"#), expected);
+    assert_eq!(from_str::<Tup>(r#"[10 "abcd"]"#), expected);
+
+    // FIXME: this doesn't work yet
+    //assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
+}
+
+#[test]
+fn tuple_struct_from_list_or_vec() {
+    #[derive(Deserialize, Debug, PartialEq)]
+    struct Tup(i32, String);
+
+    let expected = Ok(Tup(10, String::from("abcd")));
     assert_eq!(from_str::<Tup>(r#"(10 "abcd")"#), expected);
     assert_eq!(from_str::<Tup>(r#"[10 "abcd"]"#), expected);
 
