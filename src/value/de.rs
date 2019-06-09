@@ -21,11 +21,17 @@ impl<'de> Deserialize<'de> for Value {
 
 macro_rules! deserialize_integer {
     ($method:ident, $visit_method:ident) => {
-        fn $method<V>(self, _visitor: V) -> Result<V::Value, Error>
+        fn $method<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
         {
-            unimplemented!()
+            match self {
+                Value::Integer(i) => {
+                    let conv = num_traits::NumCast::from(i).ok_or(Error::NumericOutOfBounds)?;
+                    visitor.$visit_method(conv)
+                }
+                _ => Err(Error::Bad),
+            }
         }
     }
 }
@@ -104,7 +110,10 @@ impl<'de> Deserializer<'de> for Value {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self {
+            Value::String(s) => visitor.visit_string(s),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_bytes<V>(self, _visitor: V) -> Result<V::Value, Error>

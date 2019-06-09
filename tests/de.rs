@@ -78,3 +78,14 @@ fn unit() {
     assert_eq!(from_str::<()>("nil"), Ok(()));
     assert_eq!(from_str::<()>("3"), Err(Error::Bad));
 }
+
+#[test]
+fn tuple_from_list_or_vec() {
+    type Tup = (i32, String);
+    let expected = Ok((10, String::from("abcd")));
+    assert_eq!(from_str::<Tup>(r#"(10 "abcd")"#), expected);
+    assert_eq!(from_str::<Tup>(r#"[10 "abcd"]"#), expected);
+
+    // FIXME: this doesn't work yet
+    //assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
+}

@@ -273,7 +273,12 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match dbg!(self.read_parsed())? {
+            EValue::List(l) | EValue::Vector(l) => {
+                visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
+            }
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_tuple_struct<V>(
