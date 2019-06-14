@@ -259,7 +259,11 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        match self.read_parsed()? {
+        match dbg!(self.read_parsed())? {
+            v @ EValue::Integer(_) => {
+                self.hack_val = Some(v);
+                visitor.visit_newtype_struct(self)
+            }
             EValue::List(mut l) | EValue::Vector(mut l) => {
                 let val = l.pop();
                 if val.is_some() && l.is_empty() {

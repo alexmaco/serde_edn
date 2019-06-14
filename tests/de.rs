@@ -105,11 +105,12 @@ fn tuple_struct_from_list_or_vec() {
 }
 
 #[test]
-fn newtype_struct_from_list_or_vec() {
+fn newtype_struct() {
     #[derive(Deserialize, Debug, PartialEq)]
     struct Tup(i32);
 
     let expected = Ok(Tup(10));
+    assert_eq!(from_str::<Tup>(r#"10"#), expected);
     assert_eq!(from_str::<Tup>(r#"(10)"#), expected);
     assert_eq!(from_str::<Tup>(r#"[10]"#), expected);
 
