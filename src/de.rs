@@ -259,7 +259,18 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::List(mut l) | EValue::Vector(mut l) => {
+                let val = l.pop();
+                if val.is_some() && l.is_empty() {
+                    self.hack_val = val;
+                    visitor.visit_newtype_struct(self)
+                } else {
+                    Err(Error::Bad)
+                }
+            }
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_seq<V>(mut self, visitor: V) -> Result<V::Value>
@@ -273,7 +284,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        match dbg!(self.read_parsed())? {
+        match self.read_parsed()? {
             EValue::List(l) | EValue::Vector(l) => {
                 visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
             }
