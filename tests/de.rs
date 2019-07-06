@@ -1,5 +1,5 @@
 use serde_derive::Deserialize;
-use serde_edn::{edn, from_str, Error, Value};
+use serde_edn::{from_str, Error};
 
 use maplit::hashmap;
 

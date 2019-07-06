@@ -174,14 +174,14 @@ impl From<EValue> for Value {
             EValue::Keyword(s) => Value::Keyword(s),
             EValue::Integer(i) => Value::Integer(i),
             EValue::Float(f) => Value::Float(f.into_inner().into()),
-            EValue::List(v) => Value::List(v.into_iter().map(|e| Value::from(e)).collect()),
-            EValue::Vector(v) => Value::Vector(v.into_iter().map(|e| Value::from(e)).collect()),
+            EValue::List(v) => Value::List(v.into_iter().map(Value::from).collect()),
+            EValue::Vector(v) => Value::Vector(v.into_iter().map(Value::from).collect()),
             EValue::Map(m) => Value::Map(
                 m.into_iter()
                     .map(|(k, v)| (Value::from(k), Value::from(v)))
                     .collect(),
             ),
-            EValue::Set(s) => Value::Set(s.into_iter().map(|e| Value::from(e)).collect()),
+            EValue::Set(s) => Value::Set(s.into_iter().map(Value::from).collect()),
             EValue::Tagged(s, val) => Value::Tagged(Tagged::User(
                 Symbol { inner: s },
                 Box::new(Value::from(*val)),
