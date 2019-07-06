@@ -127,7 +127,7 @@ pub enum Tagged {
 
 // TODO: these are just test implementations
 impl Symbol {
-    pub fn full(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         &self.inner
     }
 

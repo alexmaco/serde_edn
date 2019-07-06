@@ -248,11 +248,16 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         }
     }
 
-    fn deserialize_unit_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value>
+    fn deserialize_unit_struct<V>(self, name: &'static str, visitor: V) -> Result<V::Value>
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::Vector(ref v) if v.is_empty() => visitor.visit_unit(),
+            EValue::List(ref v) if v.is_empty() => visitor.visit_unit(),
+            EValue::Symbol(ref s) if s.as_str() == name => visitor.visit_unit(),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_newtype_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value>

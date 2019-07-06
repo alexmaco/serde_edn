@@ -116,3 +116,18 @@ fn newtype_struct() {
 
     assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
 }
+
+#[test]
+fn unit_struct() {
+    #[derive(Deserialize, Debug, PartialEq)]
+    struct YewNit;
+
+    let expected = Ok(YewNit);
+    assert_eq!(from_str::<YewNit>(r#"()"#), expected);
+    assert_eq!(from_str::<YewNit>(r#"[]"#), expected);
+    assert_eq!(from_str::<YewNit>(r#"YewNit"#), expected);
+
+    let err = Err(Error::Bad);
+    assert_eq!(from_str::<YewNit>(r#"[10]"#), err);
+    assert_eq!(from_str::<YewNit>(r#"(10)"#), err);
+}
