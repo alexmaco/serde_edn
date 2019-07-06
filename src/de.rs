@@ -320,13 +320,15 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         unimplemented!()
     }
 
-    fn deserialize_tuple<V>(self, _len: usize, visitor: V) -> Result<V::Value>
+    fn deserialize_tuple<V>(self, len: usize, visitor: V) -> Result<V::Value>
     where
         V: Visitor<'de>,
     {
         match self.read_parsed()? {
-            EValue::List(l) | EValue::Vector(l) => {
+            EValue::List(l) | EValue::Vector(l) => if l.len() == len {
                 visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
+            } else {
+                Err(Error::Bad)
             }
             _ => Err(Error::Bad),
         }
@@ -335,15 +337,17 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     fn deserialize_tuple_struct<V>(
         self,
         _name: &'static str,
-        _len: usize,
+        len: usize,
         visitor: V,
     ) -> Result<V::Value>
     where
         V: Visitor<'de>,
     {
         match self.read_parsed()? {
-            EValue::List(l) | EValue::Vector(l) => {
+            EValue::List(l) | EValue::Vector(l) => if l.len() == len {
                 visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
+            } else {
+                Err(Error::Bad)
             }
             _ => Err(Error::Bad),
         }

@@ -89,8 +89,7 @@ fn tuple_from_list_or_vec() {
     assert_eq!(from_str::<Tup>(r#"(10 "abcd")"#), expected);
     assert_eq!(from_str::<Tup>(r#"[10 "abcd"]"#), expected);
 
-    // FIXME: this doesn't work yet
-    //assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
+    assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
 }
 
 #[test]
@@ -102,8 +101,7 @@ fn tuple_struct_from_list_or_vec() {
     assert_eq!(from_str::<Tup>(r#"(10 "abcd")"#), expected);
     assert_eq!(from_str::<Tup>(r#"[10 "abcd"]"#), expected);
 
-    // FIXME: this doesn't work yet
-    //assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
+    assert_eq!(from_str::<Tup>(r#"[10 "abcd" 3]"#), Err(Error::Bad));
 }
 
 #[test]
