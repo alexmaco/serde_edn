@@ -1,6 +1,8 @@
 use serde_derive::Deserialize;
 use serde_edn::{edn, from_str, Error, Value};
 
+use maplit::hashmap;
+
 macro_rules! integer_test {
     ($int:ty, $normal:expr, $overflow:expr) => {
         let normal: $int = $normal;
@@ -130,4 +132,19 @@ fn unit_struct() {
     let err = Err(Error::Bad);
     assert_eq!(from_str::<YewNit>(r#"[10]"#), err);
     assert_eq!(from_str::<YewNit>(r#"(10)"#), err);
+}
+
+#[test]
+fn map() {
+    use std::collections::HashMap;
+
+    type M = HashMap<i32, String>;
+
+    let m: M = hashmap! {
+        5 => "abc".into(),
+        8 => "def".into(),
+    };
+
+    let expected = Ok(m);
+    assert_eq!(from_str::<M>(r#"{8 "def" 5 "abc"}"#), expected);
 }

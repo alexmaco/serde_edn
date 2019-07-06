@@ -5,6 +5,7 @@ use serde::de::{
     self, Deserialize, DeserializeSeed, EnumAccess, IntoDeserializer, MapAccess, SeqAccess,
     VariantAccess, Visitor,
 };
+use std::collections::BTreeMap;
 
 use edn::parser::Parser;
 use edn::Value as EValue;
@@ -89,6 +90,37 @@ impl<'de> SeqAccess<'de> for ListAccess {
             Ok(None)
         } else {
             Ok(Some(seed.deserialize(self.0.remove(0))?))
+        }
+    }
+}
+
+struct MapStore {
+    keys: Vec<Value>,
+    vals: Vec<Value>,
+}
+
+impl<'de> MapAccess<'de> for MapStore {
+    type Error = Error;
+
+    fn next_key_seed<T>(&mut self, seed: T) -> result::Result<Option<T::Value>, Self::Error>
+    where
+        T: DeserializeSeed<'de>,
+    {
+        if self.keys.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(seed.deserialize(self.keys.remove(0))?))
+        }
+    }
+
+    fn next_value_seed<T>(&mut self, seed: T) -> result::Result<T::Value, Self::Error>
+    where
+        T: DeserializeSeed<'de>,
+    {
+        if self.vals.is_empty() {
+            Err(Error::Bad)
+        } else {
+            Ok(seed.deserialize(self.vals.remove(0))?)
         }
     }
 }
@@ -309,7 +341,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        match dbg!(self.read_parsed())? {
+        match self.read_parsed()? {
             EValue::List(l) | EValue::Vector(l) => {
                 visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
             }
@@ -321,7 +353,16 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::Map(m) => {
+                let (keys, vals): (Vec<_>, Vec<_>) = m
+                    .into_iter()
+                    .map(|(k, v)| (Value::from(k), Value::from(v)))
+                    .unzip();
+                visitor.visit_map(MapStore { keys, vals })
+            }
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_struct<V>(
