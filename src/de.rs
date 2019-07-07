@@ -398,7 +398,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        self.deserialize_map(visitor)
     }
 
     fn deserialize_enum<V>(

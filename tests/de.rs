@@ -171,3 +171,18 @@ fn vector() {
     //let err = Err(Error::Bad);
     //assert_eq!(from_str::<V>(r#"#{3 4 6}"#), err);
 }
+
+#[test]
+fn struct_from_map() {
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct S {
+        a: u32,
+        b: String,
+    }
+
+    let expected = Ok(S {
+        a: 74,
+        b: "abc".into(),
+    });
+    assert_eq!(from_str::<S>(r#"{:b "abc" :a 74}"#), expected);
+}

@@ -223,7 +223,10 @@ impl<'de> Deserializer<'de> for Value {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self {
+            Value::Keyword(s) => visitor.visit_str(s.trim_start_matches(":")),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_ignored_any<V>(self, visitor: V) -> Result<V::Value, Error>
