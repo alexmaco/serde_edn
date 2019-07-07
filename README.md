@@ -30,11 +30,13 @@ Serialization:
 * handling of symbols and keywords
 
 
-## TODO list
+## Working items list
 
-* [ ] Serialization
-* [ ] Deserialization
-* [ ] `edn!` macro
+* [ ] Serialization to string
+* [ ] Serialization to Value
+* [x] Deserialization from str (partial support)
+* [x] Deserialization from Value (partial support)
+* [x] `edn!` macro
 * [x] utility functions for `Value`
 
 
