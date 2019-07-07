@@ -224,7 +224,7 @@ impl<'de> Deserializer<'de> for Value {
         V: Visitor<'de>,
     {
         match self {
-            Value::Keyword(s) => visitor.visit_str(s.trim_start_matches(":")),
+            Value::Keyword(s) => visitor.visit_str(&s),
             _ => Err(Error::Bad),
         }
     }
