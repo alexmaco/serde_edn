@@ -78,6 +78,15 @@ impl<'de> Deserializer<'de> {
 
 struct ListAccess(Vec<Value>);
 
+impl<I> From<I> for ListAccess
+where
+    I: IntoIterator<Item = Value>,
+{
+    fn from(i: I) -> Self {
+        Self(i.into_iter().collect())
+    }
+}
+
 use std::result;
 impl<'de> SeqAccess<'de> for ListAccess {
     type Error = Error;
@@ -317,7 +326,14 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        unimplemented!()
+        match self.read_parsed()? {
+            EValue::Set(l) => visitor.visit_seq(ListAccess::from(l.into_iter().map(Value::from))),
+            EValue::Vector(l) => {
+                visitor.visit_seq(ListAccess::from(l.into_iter().map(Value::from)))
+            }
+            EValue::List(l) => visitor.visit_seq(ListAccess::from(l.into_iter().map(Value::from))),
+            _ => Err(Error::Bad),
+        }
     }
 
     fn deserialize_tuple<V>(self, len: usize, visitor: V) -> Result<V::Value>
@@ -325,10 +341,12 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: Visitor<'de>,
     {
         match self.read_parsed()? {
-            EValue::List(l) | EValue::Vector(l) => if l.len() == len {
-                visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
-            } else {
-                Err(Error::Bad)
+            EValue::List(l) | EValue::Vector(l) => {
+                if l.len() == len {
+                    visitor.visit_seq(ListAccess::from(l.into_iter().map(Value::from)))
+                } else {
+                    Err(Error::Bad)
+                }
             }
             _ => Err(Error::Bad),
         }
@@ -344,10 +362,12 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: Visitor<'de>,
     {
         match self.read_parsed()? {
-            EValue::List(l) | EValue::Vector(l) => if l.len() == len {
-                visitor.visit_seq(ListAccess(l.into_iter().map(Value::from).collect()))
-            } else {
-                Err(Error::Bad)
+            EValue::List(l) | EValue::Vector(l) => {
+                if l.len() == len {
+                    visitor.visit_seq(ListAccess::from(l.into_iter().map(Value::from)))
+                } else {
+                    Err(Error::Bad)
+                }
             }
             _ => Err(Error::Bad),
         }

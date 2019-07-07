@@ -1,7 +1,7 @@
 use serde_derive::Deserialize;
 use serde_edn::{from_str, Error};
 
-use maplit::hashmap;
+use maplit::{hashmap, hashset};
 
 macro_rules! integer_test {
     ($int:ty, $normal:expr, $overflow:expr) => {
@@ -145,4 +145,29 @@ fn map() {
 
     let expected = Ok(m);
     assert_eq!(from_str::<M>(r#"{8 "def" 5 "abc"}"#), expected);
+}
+
+#[test]
+fn set() {
+    use std::collections::HashSet;
+
+    type S = HashSet<i32>;
+
+    let s: S = hashset! { 9, 4, 3 };
+
+    let expected = Ok(s);
+    assert_eq!(from_str::<S>(r#"#{3 9 4}"#), expected);
+}
+
+#[test]
+fn vector() {
+    type V = Vec<i32>;
+    let v = vec![3, 4, 6, 4, 4];
+
+    let expected = Ok(v);
+    assert_eq!(from_str::<V>(r#"[3 4 6 4 4]"#), expected);
+    assert_eq!(from_str::<V>(r#"(3 4 6 4 4)"#), expected);
+
+    //let err = Err(Error::Bad);
+    //assert_eq!(from_str::<V>(r#"#{3 4 6}"#), err);
 }
